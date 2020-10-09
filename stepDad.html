@@ -37,8 +37,47 @@
                 parser.style.width = 2000 + 'px';
                 parser.style.height = 1000 +'px';
                 document.getElementById('main-content').appendChild(parser);
-                console.log("called here");
-/*
+
+                let fromServer = {
+                    // lofunc is used to determine number of ticks on x axis.
+                    "lofunc": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],    
+                    "minValue": 0,
+                    "maxValue": 100,
+                    "title": "Independent Variable vs. Dependent Variable",
+                    "xlabel": "Independent Variable (Units)",
+                    "ylabel": "Dependent Variable (Units)",
+                    "xVals": [
+                        "260 - 265",
+                        "265 - 270",
+                        "270 - 275",
+                        "275 - 280",
+                        "280 - 285",
+                        "285 - 290",
+                        "290 - 295",
+                        "295 - 300",
+                        "300 - 305",
+                        "305 - 310"
+                    ],
+                    "rotateTicks": true
+                }
+
+                // To pass argument(s) to curveParser, stringify them
+                // and replace yuh with your string.
+                // parser.contentWindow.postMessage('yuh', '*');
+                let args = JSON.stringify(fromServer);
+                // parser.contentWindow.postMessage(args, '*');
+
                 function send()
                 {
                     parser.contentWindow.postMessage('the message: ', '*');
@@ -54,17 +93,18 @@
                     }
                 }
 
+
                 // Listen to message from child window
                 bindEvent(window, 'message', function (e) {
-                    console.log("bind event was called");
+                    console.log("message from child: " + e.data);
+                    parser.contentWindow.postMessage(args, '*');
                     // let normalizedCoords = JSON.stringify(normCoords(JSON.parse(e.data)));
                     // results.innerHTML = normalizedCoords;
                     // results.innerHTML = e.data;
                     // drawnLine is a global.
                     // drawnLine = normalizedCoords;
-                    console.log("this, from stepDad: ", this);
+                    // console.log("this, from stepDad: ", this);
                 });
- */
             </script>
 
         </section>
