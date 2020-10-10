@@ -1,5 +1,5 @@
 /*
-normalizes browser window coordinates into Cartesian coordinates.
+normCoords normalizes browser window coordinates into Cartesian coordinates.
 parameters:
     arg: an object with these key/value pairs:
         coords: an array of arrays of [x,y] coordinate pairs,
@@ -32,9 +32,11 @@ function normCoords(arg)
         y = yRatio * scaleFactor + arg.yMin;
         // x and y belong together.
         newCoords[x] = y;
-    }
+    } 
     return(newCoords);
 }
+
+
 
 
 

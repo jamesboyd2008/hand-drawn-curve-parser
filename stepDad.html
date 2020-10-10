@@ -104,27 +104,18 @@
                         }
                         else if(e.data == "hitPart2")
                         {
-                            //$('#secondCInstructions').hide();
-                            //$('#thirdCInstructions').show();
-                            //incrementCounter();
-
                             console.log("hit part 2 from parent");
                             return;
                         }
                         else if(e.data == "returnedToPart1")
                         {
-                            //$('#thirdCInstructions').hide();
-                            //$('#secondCInstructions').show();
-                            
-                            //decrementCounter();
-
                             console.log("returned to part 1 from parent");
                             return;
                         }
                         
                         
-                        //let normalizedCoords = normCoords(JSON.parse(e.data));
-                        //results.innerHTML = normalizedCoords;
+                        let normalizedCoords = normCoords(JSON.parse(e.data));
+                        results.innerHTML = normalizedCoords;
                         // drawnLine is a global from js/onReady.js
                         //drawnLine = normalizedCoords;
                         // trigger User's progression to next view
