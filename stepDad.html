@@ -30,6 +30,7 @@
             <br/>
 
             <script>
+
                 var iframeSource = 'curveParser.html';
                 var parser = document.createElement('iframe');
                 parser.setAttribute('src', iframeSource);
@@ -37,7 +38,7 @@
                 parser.style.width = 2000 + 'px';
                 parser.style.height = 1000 +'px';
                 document.getElementById('main-content').appendChild(parser);
-
+                
                 let fromServer = {
                     // lofunc is used to determine number of ticks on x axis.
                     "lofunc": [
@@ -72,39 +73,69 @@
                     "rotateTicks": true
                 }
 
-                // To pass argument(s) to curveParser, stringify them
-                // and replace yuh with your string.
-                // parser.contentWindow.postMessage('yuh', '*');
-                let args = JSON.stringify(fromServer);
-                // parser.contentWindow.postMessage(args, '*');
-
-                function send()
-                {
-                    parser.contentWindow.postMessage('the message: ', '*');
-                }
-
-                function bindEvent(element, eventName, eventHandler)
-                {
-                    if (element.addEventListener)
-                    {
-                        element.addEventListener(eventName, eventHandler, false);
-                    } else if (element.attachEvent) {
-                        element.attachEvent('on' + eventName, eventHandler);
-                    }
-                }
-
-
-                // Listen to message from child window
-                bindEvent(window, 'message', function (e) {
-                    console.log("message from child: " + e.data);
-                    parser.contentWindow.postMessage(args, '*');
-                    // let normalizedCoords = JSON.stringify(normCoords(JSON.parse(e.data)));
-                    // results.innerHTML = normalizedCoords;
-                    // results.innerHTML = e.data;
-                    // drawnLine is a global.
-                    // drawnLine = normalizedCoords;
-                    // console.log("this, from stepDad: ", this);
+                $("#cParser").load(function () {
+                    setupIframe(fromServer);
                 });
+
+                function setupIframe(fromServer)
+                {
+                    var parser = document.getElementById('cParser');
+                    function bindEvent(element, eventName, eventHandler) 
+                    {
+                        if (element.addEventListener)
+                        {
+                            element.addEventListener(eventName, eventHandler, false);
+                        } else if (element.attachEvent) {
+                            element.attachEvent('on' + eventName, eventHandler);
+                        }
+                    }
+
+                    // Listen to message from child window
+                    bindEvent(window, 'message', function (e) {
+
+                        console.log("message from child: " + e.data);
+
+                        if(e.data == "ready")
+                        {
+                            console.log("Child is ready");
+                            let args = JSON.stringify(fromServer);
+                            parser.contentWindow.postMessage(args, '*');  
+                            return;
+                        }
+                        else if(e.data == "hitPart2")
+                        {
+                            //$('#secondCInstructions').hide();
+                            //$('#thirdCInstructions').show();
+                            //incrementCounter();
+
+                            console.log("hit part 2 from parent");
+                            return;
+                        }
+                        else if(e.data == "returnedToPart1")
+                        {
+                            //$('#thirdCInstructions').hide();
+                            //$('#secondCInstructions').show();
+                            
+                            //decrementCounter();
+
+                            console.log("returned to part 1 from parent");
+                            return;
+                        }
+                        
+                        
+                        //let normalizedCoords = normCoords(JSON.parse(e.data));
+                        //results.innerHTML = normalizedCoords;
+                        // drawnLine is a global from js/onReady.js
+                        //drawnLine = normalizedCoords;
+                        // trigger User's progression to next view
+                        //$("#stepDad").attr("style", "display: none");
+                        // $("#outer-container").attr("style", "display: inline");
+                        //$("#curveIntro").hide(); // hide curveIntro's Next button.
+                        //incrementCounter();
+                        //$("#quiz-keypoints").show();
+                    });
+                }
+
             </script>
 
         </section>
