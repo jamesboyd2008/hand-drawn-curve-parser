@@ -1,7 +1,6 @@
 const http = require('http');
 const fs   = require ('fs');
 const url  = require ('url');
-
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -60,6 +59,21 @@ var server = http.createServer(function(request, response) {
                 }
             });
             break;
+        case '/favicon.ico':
+            fs.readFile(__dirname + path, function(error, data) {
+                if (error) {
+                    response.writeHead(404);
+                    response.write(error);
+                    response.end();
+                } else {
+                    response.writeHead(200, {
+                        'Content-Type': 'image/x-icon'
+                    });
+                    response.write(data);
+                    response.end();
+                }
+            });
+            break;
         default:
             response.writeHead(404);
             response.write("oops, not much here - 404");
@@ -67,12 +81,6 @@ var server = http.createServer(function(request, response) {
             break;
     }
 });
-
-
-
-
-
-
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

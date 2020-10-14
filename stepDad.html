@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -24,12 +23,52 @@
         </header>
         <section id="main-content">
             <h3>
-            <button onclick="send()" id="message_button">send message</button>
-            <p>Message:</p>
             <div id="results"></div>
+            </h3>
             <br/>
 
             <script>
+
+
+                /*
+                normCoords normalizes browser window coordinates into Cartesian coordinates.
+                parameters:
+                    arg: an object with these key/value pairs:
+                        coords: an array of arrays of [x,y] coordinate pairs,
+                        height: the pixel height of the User-drawn graph area,
+                        coordQuant: the quantity of coordinate pairs,
+                        yMin: the smallest possible y value,
+                        yMax: the largest possible y value.
+                Returns an object, newCoords, which consists of
+                    coordinate pairs, formatted thusly: {x: y, x: y, x: y, ...}
+                */
+                function normCoords(arg)
+                {
+                    let newCoords = {};
+                    let x, y, rawY, scaleFactor, yRatio;
+                    /*
+                    Iterate over all coords, pushing appropriately scaled
+                    coordinates into newCoords.
+                    */
+                    for (let i = 0; i < arg.coordQuant; i++)
+                    {
+                        // AI algo is expecting x to be an index.
+                        x = i;
+                        // Upside down y coord in an HTML element in a browser window.
+                        rawY = arg.coords[i][1];
+                        // (Percent of max height on chart) divided by 100.
+                        yRatio = 1 - (rawY / arg.height);
+                        // Difference between the largest and smallest [possible?] y values.
+                        scaleFactor = arg.yMax - arg.yMin;
+                        // The actual y value chosen by the User at one coordinate.
+                        y = yRatio * scaleFactor + arg.yMin;
+                        // x and y belong together.
+                        newCoords[x] = y;
+                    }
+                    return(newCoords);
+                }
+
+
                 var iframeSource = 'curveParser.html';
                 var parser = document.createElement('iframe');
                 parser.setAttribute('src', iframeSource);
@@ -37,7 +76,7 @@
                 parser.style.width = 2000 + 'px';
                 parser.style.height = 1000 +'px';
                 document.getElementById('main-content').appendChild(parser);
-
+                
                 let fromServer = {
                     // lofunc is used to determine number of ticks on x axis.
                     "lofunc": [
@@ -72,39 +111,62 @@
                     "rotateTicks": true
                 }
 
-                // To pass argument(s) to curveParser, stringify them
-                // and replace yuh with your string.
-                // parser.contentWindow.postMessage('yuh', '*');
-                let args = JSON.stringify(fromServer);
-                // parser.contentWindow.postMessage(args, '*');
-
-                function send()
-                {
-                    parser.contentWindow.postMessage('the message: ', '*');
-                }
-
-                function bindEvent(element, eventName, eventHandler)
-                {
-                    if (element.addEventListener)
-                    {
-                        element.addEventListener(eventName, eventHandler, false);
-                    } else if (element.attachEvent) {
-                        element.attachEvent('on' + eventName, eventHandler);
-                    }
-                }
-
-
-                // Listen to message from child window
-                bindEvent(window, 'message', function (e) {
-                    console.log("message from child: " + e.data);
-                    parser.contentWindow.postMessage(args, '*');
-                    // let normalizedCoords = JSON.stringify(normCoords(JSON.parse(e.data)));
-                    // results.innerHTML = normalizedCoords;
-                    // results.innerHTML = e.data;
-                    // drawnLine is a global.
-                    // drawnLine = normalizedCoords;
-                    // console.log("this, from stepDad: ", this);
+                $("#cParser").load(function () {
+                    setupIframe(fromServer);
                 });
+
+                function setupIframe(fromServer)
+                {
+                    var parser = document.getElementById('cParser');
+                    function bindEvent(element, eventName, eventHandler) 
+                    {
+                        if (element.addEventListener)
+                        {
+                            element.addEventListener(eventName, eventHandler, false);
+                        } else if (element.attachEvent) {
+                            element.attachEvent('on' + eventName, eventHandler);
+                        }
+                    }
+
+                    // Listen to message from child window
+                    bindEvent(window, 'message', function (e) {
+
+                        console.log("message from child: " + e.data);
+
+                        if(e.data == "ready")
+                        {
+                            console.log("Child is ready");
+                            let args = JSON.stringify(fromServer);
+                            parser.contentWindow.postMessage(args, '*');  
+                            return;
+                        }
+                        else if(e.data == "hitPart2")
+                        {
+                            console.log("hit part 2 from parent");
+                            return;
+                        }
+                        else if(e.data == "returnedToPart1")
+                        {
+                            console.log("returned to part 1 from parent");
+                            return;
+                        }
+                        
+                        // Display the coordinates of the bubbles.
+                        let addition; // one bucket,y pair.
+                        let normalizedCoords = normCoords(JSON.parse(e.data));
+                        let outText = "The coordinates of the bubbles from the line:<br>";
+                        for(
+                            let bubble = 0; 
+                            bubble < Object.keys(normalizedCoords).length; 
+                            bubble++
+                        ) {
+                            addition = bubble.toString() + ": " + normalizedCoords[bubble.toString()] + '<br>';
+                            outText += addition;
+                        };
+                        results.innerHTML = outText;
+                    });
+                }
+
             </script>
 
         </section>
