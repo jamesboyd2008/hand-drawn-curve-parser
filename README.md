@@ -52,7 +52,23 @@ When you run`node app.js` from the command line, your are using Node, a JavaScri
 
 ### Parent/Child communication
 
-`stepDad.html` contains a giant `<script>` tag that grabs a file called `curveParser.html` from the same directory.  It then creates an `iframe` HTML element, of this *.html file, and adds it to the document object model (DOM). This is the child.  `stepDad` is the parent. The parent and the child communicate.   
+The parent and the child message each other in this order:
+    1. Parent initiates the loading of the child onto the DOM,
+       and waits for the completion of this loading event.
+    2. The child waits for a message from the parent.
+    3. Upon recognizing that the child loaded onto the DOM,
+       the parent sends the child a message, `fromServer`,
+       containing all the data necessary to generate an empty graph.
+    4. Upon receiving `fromServer`, the child renders an empty graph and
+       waits for the user to draw on it.
+    5. Once the user indicates that they are done making changes to their curve,
+       the child parses the line into a series of discrete browser coordinates.
+    6. The child sends the coordinates to the parent.
+    7. The parent transforms the browser coordinates into cartesian
+       coordinates and renders them on the DOM. 
+
+To restate the above: `stepDad.html` contains a giant `<script>` tag that grabs a file called `curveParser.html` from the same directory.  It then creates an `iframe` HTML element, of this *.html file, and adds it to the document object model (the DOM). This is the child.  `stepDad` is the parent. The parent and the child message each other, back and forth.  The parent assigns an id, `cParser`, to the child, an `<iframe>`.  The parent, monitoring the loading process of the DOM, waits for the `cParser` element to load with jQuery’s `load` function.  Once this has occurred, the parent calls a function called `setupIframe`.  This function, defined in the `<script>` tag in `stepDad.html`, defines a function called `bindEvent`, which is used to monitor the browser window for a message.  `setupIframe` calls `bindEvent` which waits for a message.  The child, once loaded, posts a “ready” message to the parent.  Once the parent’s `bindEvent` detects this message, `bindEvent` sends the child `fromServer`, which contains everything the child needs to render the graph for the user to draw on.  Once the user draws the line, from the left purple line to the right purple line, makes their changes to the bubbles via click and drag, then clicks that they are sure that they don’t want to make any additional changes, the child parses the line into points and sends them to the parent.  The parent converts the points into cartesian coordinates and displays them at the top of the web page.
+
 
 Enjoy
 
