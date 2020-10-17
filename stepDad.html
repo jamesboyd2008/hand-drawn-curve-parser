@@ -133,9 +133,14 @@
                     setupIframe(fromServer);
                 });
 
+                // Add the child to the DOM, and 
+                // receive/transmit messages from/to the child.
                 function setupIframe(fromServer)
                 {
+                    // The child.
                     var parser = document.getElementById('cParser');
+
+                    // Bind browser event handlers to browser elements.
                     function bindEvent(element, eventName, eventHandler) 
                     {
                         if (element.addEventListener)
@@ -146,7 +151,7 @@
                         }
                     }
 
-                    // Listen to message from child window
+                    // Listen to child and send messages to child.
                     bindEvent(window, 'message', function (e) {
 
                         console.log("message from child: " + e.data);
@@ -161,17 +166,45 @@
                         else if(e.data == "hitPart2")
                         {
                             console.log("hit part 2 from parent");
+                            // Add whatever you want, here.
+                            // Perhaps you want to increment a task counter?++
+                            // This block executes when the user has drawn
+                            // their line and is now dragging bubbles.
                             return;
                         }
                         else if(e.data == "returnedToPart1")
                         {
                             console.log("returned to part 1 from parent");
+                            // Add whatever you want, here.
+                            // Perhaps you want to decrement a task coutner?--
+                            // This block executes when the user trashed
+                            // their old line and wants a mulligan.
                             return;
                         }
                         
                         // Display the coordinates of the bubbles.
                         let addition; // one bucket,y pair.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                        /* 
+                        If you want to to use one variable from this repo,
+                        beyond this repo, it's normalizedCoords, which
+                        contains an object mapping bucket numbers (x values)
+                        to y values, precisely scaled to the axis data
+                        provided in fromServer.  This is the Holy Grail
+                        of this repository.
+                        */
                         let normalizedCoords = normCoords(JSON.parse(e.data));
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                         let outText = "The coordinates of the bubbles from the line:<br>";
                         for(
                             let bubble = 0; 
