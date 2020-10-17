@@ -2,8 +2,10 @@
 <html>
 
 <!--Begin external scripts-->
+<!--jQuery is great for grabbing DOM elements and using JS-->
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!--D3 is great for JS visualizations. We use it for svg's.-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
 <!--End external scripts-->
 
@@ -11,28 +13,38 @@
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////// PART 1 ////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Part 1 is when the user draws a line.  It begins with an empty canvas
+    // and ends with a user drawn line.
+    
+    // Define variables for drawing on the canvas.
     var canvas, context, drawing = false;
+    // For rapidbly tracking the location of the mouse.
     var currX = 0, currY = 0, oldX = 0, oldY = 0;
     // BucketNum is the quantity of pixels, horizontally, between
     // two draggable bubbles on the User-drawn line.
     var BucketNum = 50;
+    // For the fine tipped sharpie.
     var halfSizeOfBrush = 0.5;
-    var image;
     var points = [];
-    
+   
+    // Hard code drawing area dimensions.
     var margin = {top: 80, right: 30, bottom: 30, left: 80},
         width = 822,
         height = 390;
     
+    // Clarify where drawing happens.
     var canvasXRange = width,
         canvasYRange = height;
+    // Used to collect the per-bucket, averaged y-values of the 
+    // user drawn line, coercing scribbles into graph functions. 
     var buckets = [];
     let jsonObj,    // data from server
         xlabel,     // x-axis label
         ylabel,     // y-axis label
         title,      // title of graph
         coordQuant; // quantity of x,y coordinate pairs from server.
-    
+   
     function tickFormatter(d)
     {
         // map arbitrary array indices to x coordinate
@@ -54,13 +66,6 @@
             .domain([jsonObj.minValue, jsonObj.maxValue]) 
             .range([height, 0]);
         
-        /*
-        var xAxis = d3.axisBottom() 
-            .scale(x)
-            .tickFormat(tickFormatter);
-        */
-
-        
         var xAxis = d3.axisBottom() 
             .scale(x)
             .ticks(Object.keys(jsonObj.lofunc).length)
@@ -71,7 +76,6 @@
 
         var area = d3.area();
         
-		console.log("adding behindcanvas!");
         var svg = d3.select(".part1")
                 .append('svg')
                 .attr("id","behindCanvas")
@@ -80,10 +84,8 @@
 				.attr("z-index",-1)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-				
-           
         
-        // Add bubble line anchor point such the y axis doesn't get
+        // Add bubble line anchor point so the y axis doesn't get
         // whited out, later. 
         svg.append("g")
             .attr("class", "y axis")
@@ -147,6 +149,7 @@
            .text(title);   
     }
 
+    // init is called by the browser when it visits this <script> tag.
     function init()
     {
         window.onmessage = function(e)
@@ -154,7 +157,6 @@
             // anything you want done once the data is loaded,
             // put it here.
             jsonObj = JSON.parse(e.data);
-            console.log('curveParser got data: ', jsonObj);
             title  = jsonObj.title;
             xlabel = jsonObj.xlabel;
             ylabel = jsonObj.ylabel;
@@ -176,11 +178,13 @@
             .attr("z-index", 1);
     }
 
+    // Send messages to the parent.
     var sendMessage = function (msg)
     {
         window.parent.postMessage(msg, '*');
     }
 
+    // Handle mouse events to draw a line.
     function ev_mouse(state, ev)
     { 
 		$("#curveMessage").hide();
@@ -213,16 +217,19 @@
         }
     }
 
+    // Euclidean distance calculator.
     function distanceBetween () 
     {
         return Math.sqrt(Math.pow(currX - oldX, 2) + Math.pow(currY - oldY, 2));
     }
 
+    // SOH-CAH-TOA
     function angleBetween () 
     {
         return Math.atan2(currX - oldX, currY - oldY);
     }
 
+    // Use trigonometry to make one pixel black.
     function drawStamp()
     {
         const dist = distanceBetween();
@@ -275,7 +282,6 @@
         }
         
 		sendMessage("hitPart2");
-        console.log("data submitted, buckets =" + buckets);
 
         points = buckets;
         numActivePoints = points.length;
@@ -285,12 +291,14 @@
         update();   
     }
 
+    // Clear the canvas.
     function clearall()
     {
         context.clearRect(0, 0, canvas.width, canvas.height);
         drawing = false;
     }
 
+    // Start over, shoud the user chose to do so.
     function reset()
     {
 		$("#curveMessage").hide();
@@ -311,10 +319,15 @@
     /////////////////////////////////////////////// PART 2 //////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Part 2 is when the user drawn line is converted from child scribbles
+    // into a fancy curve, then parsed into upside down browser coordinates.
+
+    // Use the most sensible line conversion readily available.
     var curveTypes = [
         {name: 'curveCatmullRom (α=0.5)', curve: d3.curveCatmullRom.alpha(0.5), active: true, lineString: '', clear: false, info: 'Similar to curveCardinal (tension=0) but with a parameter α that determines the parameterisation used to interpolate the points. If α=0.5 the parameterisation is centripetal and self intersecting loops are avoided.'},
     ];
 
+    // Harness d3's line powers.
     var lineGenerator = d3.line();
 
     var categoryScale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -336,6 +349,7 @@
         d3.select('.info .text').text(info);
     }
 
+    // This is only called from update(). 
     function updateMenu() 
     {
         var u = d3.select('.menu')
@@ -359,6 +373,7 @@
             .style('color', function(d, i) { return d.active ? 'white' : '#444'; });
     }
 
+    // This is only called from update(). 
     function updatePointsMenu() 
     {
         d3.select('.remove-point')
@@ -380,6 +395,7 @@
             });
     }
 
+    // This is only called from update(). 
     function updateLines() 
     {
         curveTypes.forEach(function(d) 
@@ -401,6 +417,7 @@
             .style('display', function(d) { return d.active ? 'inline' : 'none'; });
     }
 
+    // This is only called from update(). 
     function updatePoints()
     {
         var u = d3.select('g')
@@ -417,6 +434,7 @@
         u.exit().remove();
     }
 
+    // Whenever a bubble moves
     function update() 
     {
         updateMenu();
@@ -425,6 +443,7 @@
         updatePoints();
     }
 
+    // Ensure that the user is done editting their line.
     function sendData()
     {
 	
@@ -443,6 +462,7 @@
 		$("#curveMessage").show();
 	}
 	
+    // Send the coordinates to the parent. 
 	function sendDataValid()
 	{
 
