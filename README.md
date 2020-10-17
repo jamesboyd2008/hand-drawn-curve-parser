@@ -53,6 +53,7 @@ When you run`node app.js` from the command line, your are using Node, a JavaScri
 ### Parent/Child communication
 
 The parent and the child message each other in this order:
+
     1. Parent initiates the loading of the child onto the DOM,
        and waits for the completion of this loading event.
     2. The child waits for a message from the parent.
