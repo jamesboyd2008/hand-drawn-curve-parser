@@ -76,9 +76,16 @@
                 parser.style.width = 2000 + 'px';
                 parser.style.height = 1000 +'px';
                 document.getElementById('main-content').appendChild(parser);
-                
+
+                // Edit fromServer to change the graph. 
                 let fromServer = {
-                    // lofunc is used to determine number of ticks on x axis.
+                    // The length of value associated with the key 
+                    // lofunc is used to determine number of ticks 
+                    // on x axis.
+                    // The tick number is the same as the bucket number.
+                    // The zeroes are arbitrary.
+                    // To add more bubbles to the line,
+                    // add elements to this array.
                     "lofunc": [
                         0,
                         0,
@@ -90,12 +97,21 @@
                         0,
                         0,
                         0
-                    ],    
+                    ],
+                    // This is the bottom of the y-axis.
                     "minValue": 0,
+                    // This is the top of the y-axis.
                     "maxValue": 100,
+                    // Change this to whatever you want.
                     "title": "Independent Variable vs. Dependent Variable",
+                    // Label for the x-axis.
                     "xlabel": "Independent Variable (Units)",
+                    // Label for the y-axis.
                     "ylabel": "Dependent Variable (Units)",
+                    // xVals contains the individual tick labels.
+                    // The quantity of these elements must be the same
+                    // quantity as elements of lofunc.
+                    // Change these to whatever you want.
                     "xVals": [
                         "260 - 265",
                         "265 - 270",
@@ -108,6 +124,8 @@
                         "300 - 305",
                         "305 - 310"
                     ],
+                    // Determines whether the x-axis tick labels will be
+                    // rotated to avoid overcrowding for readability.
                     "rotateTicks": true
                 }
 
