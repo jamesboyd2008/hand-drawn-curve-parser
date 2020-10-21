@@ -1,5 +1,5 @@
 # hand-drawn-curve-parser
-This code enables a user to draw a line in their web browser.  Then, that line can be converted into a series of [x, y] coordinate pairs for analysis.  The user drawn line is parsed into a digital Catmull-Rom spline curve. Credit goes to Peter Cook for the curve code.  
+This code enables a user to draw a line in their web browser.  Then, that line can be converted into a series of [x, y] coordinate pairs for analysis.  The user drawn line is parsed into a digital Catmull-Rom spline curve. Credit goes to [Peter Cook](https://www.animateddata.com) for the curve [code](http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8).  
 
 ## To run this code
 
@@ -15,6 +15,10 @@ This code enables a user to draw a line in their web browser.  Then, that line c
 * Click the "Next" button.
 * Click the "Yes, I'm sure" button.
 * Observe the discrete coordinates of points on your line at the top of the page. The numbers to the left of the colon are the bucket number.  The numbers to the right of colon are the y-axis value of the bubble.
+
+
+
+
 
 ## To change the input/output:
 
@@ -48,7 +52,7 @@ This code enables a user to draw a line in their web browser.  Then, that line c
 
 ## So what is going on, here?
 
-When you run`node app.js` from the command line, your are using Node, a JavaScript engine based on Google Chrome's V8 engine, to serve this web application, locally.  You are hosting a web site on your computer just for yourself.  Website addresses get resolved into internet protocol (IP) addresses.  Your local IP address, and my local IP address, is 127.0.0.1 (a.k.a. localhost). When you direct your web browser to port 3000 at that IP, you will hopefully see this this web app.  This particular splash page is a boring 404.  However, when you append a `/stepDad.html` to that web address, you are asking for a specific route, which happens to be configured in `app.js` to respond with that file.  Communicates with another file, as described below.
+When you run`node app.js` from the command line, your are using Node, a JavaScript engine based on Google Chrome's V8 engine, to serve this web application, locally.  You are hosting a web site on your computer just for yourself.  Website addresses get resolved into internet protocol (IP) addresses.  Your local IP address, and my local IP address, is 127.0.0.1 (a.k.a. localhost). When you direct your web browser to port 3000 at that IP, you will hopefully see this this web app.  This particular splash page is a boring 404.  However, when you append a `/stepDad.html` to that web address, you are asking for a specific route, which happens to be configured in `app.js` to respond with that file.  `stepDad.html` communicates with another file, as described below.
 
 ### Parent/Child communication
 
